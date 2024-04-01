@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface FormProps {
   apiKey: string;
@@ -12,29 +13,27 @@ const FormComponent: React.FC<FormProps> = ({ apiKey }) => {
     setCode(event.target.value);
   };
 
+  // Access your API key (see "Set up your API key" above)
+  const genAI = new GoogleGenerativeAI(apiKey);
+
+  async function LLM_convert() {
+    const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+
+    const prompt = code
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    return text;
+  }
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'text-davinci-003', // Or any other GPT model you prefer
-          prompt: code,
-          max_tokens: 150, // Adjust according to your needs
-          temperature: 0.7, // Adjust according to your needs
-          stop: '\n' // Stop generation at a new line
-        })
-      };
+      const fpcore_result = await LLM_convert();
 
-      const response = await fetch('https://api.openai.com/v1/completions', requestOptions);
-      const data = await response.json();
-
-      setResponse(data.choices[0].text.trim());
+      setResponse(fpcore_result);
     } catch (error) {
       console.error('Error:', error);
     }
