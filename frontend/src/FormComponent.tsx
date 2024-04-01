@@ -1,43 +1,68 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState } from 'react';
 
-const ParagraphSender: React.FC = () => {
-  const [paragraph, setParagraph] = useState<string>('');
+interface FormProps {
+  apiKey: string;
+}
 
-  const sendParagraphToBackend = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/ping', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ paragraph })
-      });
-      if (response.ok) {
-        console.log('Paragraph sent successfully');
-      } else {
-        console.error('Failed to send paragraph');
-      }
-    } catch (error) {
-      console.error('Error sending paragraph:', error);
-    }
+const FormComponent: React.FC<FormProps> = ({ apiKey }) => {
+  const [code, setCode] = useState<string>('');
+  const [response, setResponse] = useState<string>('');
+
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCode(event.target.value);
   };
 
-  const handleParagraphChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    setParagraph(event.target.value);
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    try {
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'text-davinci-003', // Or any other GPT model you prefer
+          prompt: code,
+          max_tokens: 150, // Adjust according to your needs
+          temperature: 0.7, // Adjust according to your needs
+          stop: '\n' // Stop generation at a new line
+        })
+      };
+
+      const response = await fetch('https://api.openai.com/v1/completions', requestOptions);
+      const data = await response.json();
+
+      setResponse(data.choices[0].text.trim());
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   return (
     <div>
-      <textarea 
-        placeholder="Input your expression here..." 
-        value={paragraph} 
-        onChange={handleParagraphChange} 
-        rows={5} 
-        cols={50} 
-      />
-      <button onClick={sendParagraphToBackend}>Send Paragraph</button>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="code">Enter your code:</label>
+          <textarea
+            id="code"
+            value={code}
+            onChange={handleChange}
+            rows={10}
+            cols={50}
+          />
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+      {response && (
+        <div>
+          <h2>Response:</h2>
+          <p>{response}</p>
+        </div>
+      )}
     </div>
   );
 };
 
-export default ParagraphSender;
+export default FormComponent;
