@@ -19,7 +19,7 @@ const FormComponent: React.FC<FormProps> = ({ apiKey }) => {
   async function LLM_convert() {
     const model = genAI.getGenerativeModel({ model: "gemini-pro"});
 
-    const prompt = code
+    const prompt = code;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -32,7 +32,6 @@ const FormComponent: React.FC<FormProps> = ({ apiKey }) => {
 
     try {
       const fpcore_result = await LLM_convert();
-
       setResponse(fpcore_result);
     } catch (error) {
       console.error('Error:', error);
