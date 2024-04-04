@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { createPrompt } from './prompt';
 
 interface FormProps {
   apiKey: string;
 }
 
 const FormComponent: React.FC<FormProps> = ({ apiKey }) => {
-  const [code, setCode] = useState<string>('');
+  const [inputExpression, setInputExpression] = useState<string>('');
   const [response, setResponse] = useState<string>('');
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCode(event.target.value);
+    setInputExpression(event.target.value);
   };
 
-  // Access your API key (see "Set up your API key" above)
   const genAI = new GoogleGenerativeAI(apiKey);
 
   async function LLM_convert() {
     const model = genAI.getGenerativeModel({ model: "gemini-pro"});
 
-    const prompt = code;
+    const prompt = createPrompt(inputExpression);
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -45,7 +45,7 @@ const FormComponent: React.FC<FormProps> = ({ apiKey }) => {
           <label htmlFor="code">Enter your code:</label>
           <textarea
             id="code"
-            value={code}
+            value={inputExpression}
             onChange={handleChange}
             rows={10}
             cols={50}

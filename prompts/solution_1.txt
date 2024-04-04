@@ -1,0 +1,7 @@
+(FPCore (z)
+ (+ (log (hypot (/ z.real 2.0) (/ z.imag 2.0)))
+    (* M_LN2 2.0)))
+
+fpcore (FPCore (z) (log (hypot (/ (real z) 2) (/ (imag z) 2))) + (* 2 M_LN2))
+
+fpcore (+ (log (hypot (/ (.real z) 2.) (/ (.imag z) 2.)))) (* 2. M_LN2))
