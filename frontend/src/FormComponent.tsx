@@ -8,13 +8,15 @@ interface FormProps {
 
 const FormComponent: React.FC<FormProps> = ({ apiKey }) => {
   const [inputExpression, setInputExpression] = useState<string>('');
-  const [response, setResponse] = useState<string>('');
+  const [result, setResult] = useState<string>('');
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputExpression(event.target.value);
   };
 
   const genAI = new GoogleGenerativeAI(apiKey);
+
+  const sampleURL = 'http://127.0.0.1:8000/api/sample';
 
   async function LLM_convert() {
     const model = genAI.getGenerativeModel({ model: "gemini-pro"});
@@ -30,12 +32,24 @@ const FormComponent: React.FC<FormProps> = ({ apiKey }) => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    let fpcore_result = '(FPCore (x) :pre (<= -1e+308 x 1e+308) (- (sqrt (+ x 1)) (sqrt x)))';
+
     try {
-      const fpcore_result = await LLM_convert();
-      setResponse(fpcore_result);
+      // fpcore_result = await LLM_convert();
     } catch (error) {
       console.error('Error:', error);
     }
+
+    const herbie_result = await fetch(
+      sampleURL,
+      {
+        method: 'POST', 
+        body: `{"formula":"${fpcore_result}","seed":5}`
+      }
+    );
+
+    console.log (herbie_result);
+    setResult("hello");
   };
 
   return (
@@ -53,10 +67,10 @@ const FormComponent: React.FC<FormProps> = ({ apiKey }) => {
         </div>
         <button type="submit">Submit</button>
       </form>
-      {response && (
+      {result && (
         <div>
           <h2>Response:</h2>
-          <p>{response}</p>
+          <p>{result}</p>
         </div>
       )}
     </div>
