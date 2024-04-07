@@ -40,16 +40,15 @@ const FormComponent: React.FC<FormProps> = ({ apiKey }) => {
       console.error('Error:', error);
     }
 
-    const herbie_result = await fetch(
+    const sample = await fetch(
       sampleURL,
       {
         method: 'POST', 
         body: `{"formula":"${fpcore_result}","seed":5}`
       }
     );
-
-    console.log (herbie_result);
-    setResult("hello");
+  
+    setResult(await(sample.text()));
   };
 
   return (
