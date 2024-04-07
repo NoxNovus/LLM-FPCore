@@ -48,7 +48,11 @@ const FormComponent: React.FC<FormProps> = ({ apiKey }) => {
       }
     );
   
-    setResult(await(sample.text()));
+    // setResult(await(sample.text()));
+
+    // Open Odyssey
+    const expr = encodeURIComponent(fpcore_result);
+    window.open(`https://herbie-fp.github.io/odyssey/?expr=${expr}`);
   };
 
   return (
