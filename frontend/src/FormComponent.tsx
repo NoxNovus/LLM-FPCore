@@ -16,8 +16,6 @@ const FormComponent: React.FC<FormProps> = ({ apiKey }) => {
 
   const genAI = new GoogleGenerativeAI(apiKey);
 
-  const sampleURL = 'http://127.0.0.1:8000/api/sample';
-
   async function LLM_convert() {
     const model = genAI.getGenerativeModel({ model: "gemini-pro"});
 
@@ -32,26 +30,16 @@ const FormComponent: React.FC<FormProps> = ({ apiKey }) => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    let fpcore_result = '(FPCore (x) :pre (<= -1e+308 x 1e+308) (- (sqrt (+ x 1)) (sqrt x)))';
+    let mathjs_result = 'sqrt(x^2 * log(x)) - sin(x) * 5cos(y)';
 
     try {
-      // fpcore_result = await LLM_convert();
+      // mathjs_result = await LLM_convert();
     } catch (error) {
       console.error('Error:', error);
     }
 
-    const sample = await fetch(
-      sampleURL,
-      {
-        method: 'POST', 
-        body: `{"formula":"${fpcore_result}","seed":5}`
-      }
-    );
-  
-    // setResult(await(sample.text()));
-
     // Open Odyssey
-    const expr = encodeURIComponent(fpcore_result);
+    const expr = encodeURIComponent(mathjs_result);
     window.open(`https://herbie-fp.github.io/odyssey/?expr=${expr}`);
   };
 
